@@ -53,7 +53,7 @@ void SFPieChart::GenerateVertices()
         segment.setPrimitiveType(sf::PrimitiveType::TriangleFan);
 
         //Middle point
-        segment.append(sf::Vertex(_position, _dataset.GetColor(i)));
+        segment.append(sf::Vertex{_position, _dataset.GetColor(i)});
 
         float segmentAngle = (_dataset.GetValue(i) / totalSegmentsValue) * static_cast<float>(2 * M_PI);
 
@@ -62,7 +62,7 @@ void SFPieChart::GenerateVertices()
             float xPos = _position.x + _radius * cos(theta);
             float yPos = _position.y + _radius * sin(theta);
 
-            segment.append(sf::Vertex(sf::Vector2f(xPos, yPos), _dataset.GetColor(i)));
+            segment.append(sf::Vertex{sf::Vector2f(xPos, yPos), _dataset.GetColor(i)});
         }
 
         _pieSegments.push_back(segment);
@@ -71,8 +71,7 @@ void SFPieChart::GenerateVertices()
         /*
          * Pie Legend
          */
-        sf::Text text;
-        text.setFont(_font);
+        sf::Text text(_font);
         std::string label;
         if (_dataset.GetRepresentation() == Representation::ABSOLUTE)
         {
@@ -89,7 +88,7 @@ void SFPieChart::GenerateVertices()
         text.setCharacterSize(static_cast<unsigned int>(charSize));
 
         sf::FloatRect fr = text.getLocalBounds();
-        text.move(0, i * fr.height * 1.2f);
+        text.move(sf::Vector2f(0, i * fr.size.y * 1.2f));
 
         _textElements.push_back(text);
     }

@@ -1,4 +1,5 @@
 #include <iostream>
+#include <optional>
 
 #include "SFGraphing/SFPlot.h"
 #include "SFGraphing/SFPieChart.h"
@@ -8,12 +9,12 @@ using namespace csrc;
 int main()
 {
     sf::ContextSettings settings;
-    settings.antialiasingLevel = 4;
+    settings.antiAliasingLevel = 4;
 
-    sf::RenderWindow window(sf::VideoMode(1600, 800), "SF-Graphing", sf::Style::Default, settings);
+    sf::RenderWindow window(sf::VideoMode({1600, 800}), "SF-Graphing", sf::Style::Default, sf::State::Windowed, settings);
 
     sf::Font font;
-    font.loadFromFile("JetBrainsMono-Regular.ttf");
+    if (!font.openFromFile("JetBrainsMono-Regular.ttf")) return 1;
 
     /*
      * Plot
@@ -49,10 +50,9 @@ int main()
         SFPieChart pChart(pSet, sf::Vector2f(250, 400), 200, font);
         pChart.GenerateVertices();
 
-        sf::Event event;
-        if (window.pollEvent(event))
+        while (const std::optional<sf::Event> event = window.pollEvent())
         {
-            if (event.type == sf::Event::Closed)
+            if (event->is<sf::Event::Closed>())
             {
                 window.close();
             }
@@ -86,14 +86,15 @@ int main()
          * ----------------------------------
          */
 
-        if (sf::Mouse::isButtonPressed(sf::Mouse::Right))
+        if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Right))
         {
-            sf::Vector2u wSize = window.getSize();
-            sf::Texture texture;
-            texture.create(wSize.x, wSize.y);
+            sf::Texture texture(window.getSize());
             texture.update(window);
             sf::Image screenshot = texture.copyToImage();
-            screenshot.saveToFile("screenshot.png");
+            if (!screenshot.saveToFile("screenshot.png"))
+            {
+                std::cerr << "Cannot save screenshot\n";
+            }
         }
 
         window.display();
